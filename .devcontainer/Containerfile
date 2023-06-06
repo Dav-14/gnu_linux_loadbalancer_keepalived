@@ -1,0 +1,32 @@
+FROM debian:bullseye
+
+ARG USERPROFILE
+
+RUN apt-get update
+RUN apt-get install -y python python3-pip curl ansible wget ssh git gnupg software-properties-common locales genisoimage
+
+# Missing locales
+ENV LC_ALL=C.UTF-8
+
+# Ansible
+RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+RUN python3 get-pip.py --user
+RUN python3 -m pip install --user ansible
+
+# TERRAFORM Package
+RUN wget -O- https://apt.releases.hashicorp.com/gpg | \
+    gpg --dearmor | \
+    tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
+
+RUN gpg --no-default-keyring \
+    --keyring /usr/share/keyrings/hashicorp-archive-keyring.gpg \
+    --fingerprint
+
+RUN echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] \
+    https://apt.releases.hashicorp.com $(lsb_release -cs) main" | \
+    tee /etc/apt/sources.list.d/hashicorp.list
+
+RUN apt update && \
+    apt-get install -yqq terraform
+
+RUN useradd --create-home ${USERPROFILE} --shell /bin/bash

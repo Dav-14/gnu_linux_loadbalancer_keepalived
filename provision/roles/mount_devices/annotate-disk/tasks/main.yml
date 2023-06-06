@@ -1,0 +1,19 @@
+---
+# - name: Label & Tag Node
+#   block:
+- name: Label node for default config
+  command: |
+    kubectl label nodes {{ NODE_HOSTNAME }} node.longhorn.io/create-default-disk='config'
+  register: command_result
+  failed_when: >
+    ('labeled' not in command_result.stdout) and 
+    ('already' not in command_result.stderr)
+  # rescue:annotated
+
+- name: Annotate node for config
+  command: |
+    kubectl annotate nodes {{ NODE_HOSTNAME }} node.longhorn.io/default-disks-config='[{ "name":"{{ DISK_NAME }}", "path":"/mnt/{{ MOUNT_DEVICE }}1", "allowScheduling":true, "tags":[ "ssd", "fast" ] }]'
+  register: command_result
+  failed_when: >
+    ('annotated' not in command_result.stdout) and 
+    ('already' not in command_result.stderr)

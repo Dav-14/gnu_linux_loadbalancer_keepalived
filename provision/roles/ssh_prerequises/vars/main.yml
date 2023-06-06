@@ -1,0 +1,7 @@
+username: "{{ ansible_user }}"
+packages:
+  - nano
+  - zsh
+  - git
+  - curl
+  - apt-listchanges

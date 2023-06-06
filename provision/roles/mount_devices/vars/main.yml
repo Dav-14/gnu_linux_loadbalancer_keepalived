@@ -1,0 +1,5 @@
+
+username: "{{ ansible_user }}"
+packages:
+  - python
+  - parted

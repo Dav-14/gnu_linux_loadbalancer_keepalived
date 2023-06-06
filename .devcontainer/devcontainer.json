@@ -1,0 +1,27 @@
+{
+    "build":{
+        "dockerfile": "Containerfile",
+		"args": {
+			"USERPROFILE": "${localEnv:USER}"
+		}
+    },
+    "workspaceFolder": "/app",
+    "mounts": [
+		"source=/var/run/libvirt/libvirt-sock,target=/var/run/libvirt/libvirt-sock,type=bind",
+        "source=${localWorkspaceFolder},target=/app,type=bind",
+		"source=/mnt,target=/mnt,type=bind",
+        "source=${localEnv:HOME},target=${localEnv:HOME},type=bind,consistency=cached"
+    ],
+	"remoteUser": "${localEnv:USER}",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"donjayamanne.githistory",
+				"eamodio.gitlens",
+				"mhutchie.git-graph",
+				"GitHub.copilot",
+				"hashicorp.terraform"
+			]
+		}
+	},
+}
