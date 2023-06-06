@@ -2,7 +2,7 @@ resource "libvirt_volume" "os_image" {
   count  = var.globalCount
   name   = "${var.hostname}-${count.index}-os_image"
   pool   = "default"
-  source = "debian-11-genericcloud-amd64-${count.index}.qcow2"
+  source = "${var.base_image}-${count.index}.qcow2"
   format = "qcow2"
 }
 
@@ -52,6 +52,7 @@ data "template_file" "network_config" {
 // Create the machine
 resource "libvirt_domain" "domain-debian" {
   count = var.globalCount
+  
   # domain name in libvirt, not hostname
   name   = "${var.hostname}-${count.index}"
   memory = var.memoryMB
@@ -70,7 +71,7 @@ resource "libvirt_domain" "domain-debian" {
 
   network_interface {
     network_name   = "default"
-    wait_for_lease = true
+    # wait_for_lease = true
   }
 
 
