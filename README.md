@@ -5,6 +5,7 @@ Ce projet utilise Terraform et Ansible pour automatiser le déploiement d'une in
 ## Prérequis
 
 Avant de commencer, assurez-vous d'avoir les éléments suivants :
+- Docker installé (pour terraform et ansible)
 
 - Une clé SSH nommée `id_gnu_linux` située dans le répertoire `~/.ssh/`. Cette clé sera utilisée pour accéder aux machines virtuelles provisionnées par le projet.
 
@@ -19,15 +20,19 @@ Avant de commencer, assurez-vous d'avoir les éléments suivants :
 
     Pour debian:
         - https://debian-facile.org/atelier:chantier:virtualisation-avec-libvirt
- 
-- Télécharger une image dite `cloudinit` de l'os que vous voulez installé:
-    - debian:
+
+## Télécharger l'image
+- Télécharger une image `cloudinit` de l'os que vous voulez installé:
+    - Pour Debian:
         - [Base source iso, cloud image, ect ...](https://cloud.debian.org/)
         - [Exemple avec : Daily Build](https://cloud.debian.org/images/cloud/bullseye/daily/latest/): Télécharger l'image `debian-11-genericcloud-arm64-daily.qcow2`
 
-- Ensuite il est necessaire de placé l'image dans le dossier `provision/debian-11-genericcloud-arm64-daily.qcow2`
+## Dupliquer l'image N-fois puis renommer:
 
-- Docker
+- `provision/debian-11-genericcloud-arm64-daily-1.qcow2`
+- `provision/debian-11-genericcloud-arm64-daily-2.qcow2`
+- `provision/debian-11-genericcloud-arm64-daily-3.qcow2`
+- `...`
 
 ## What is planned
 
