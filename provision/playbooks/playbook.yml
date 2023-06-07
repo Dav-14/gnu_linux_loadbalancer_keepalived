@@ -4,6 +4,7 @@
   become: true
   roles:
     - role: ssh_prerequises
+    - role: nginx
     # - role: backend
     # - role: ufw
     # - role: apparmor
