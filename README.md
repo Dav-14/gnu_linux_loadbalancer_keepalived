@@ -7,10 +7,10 @@ Ce projet utilise Terraform et Ansible pour automatiser le déploiement d'une in
 Avant de commencer, assurez-vous d'avoir les éléments suivants :
 - Docker installé (pour terraform et ansible)
 
-- Une clé SSH nommée `id_gnu_linux` située dans le répertoire `~/.ssh/`. Cette clé sera utilisée pour accéder aux machines virtuelles provisionnées par le projet.
+- Une clé SSH nommée `gnu_linux` située dans le répertoire `~/.ssh/`. Cette clé sera utilisée pour accéder aux machines virtuelles provisionnées par le projet.
 
     - Genérer la clé avec `ssh-keygen -t <algo> -b <longeur> <path>`
-    ex: `ssh-keygen -t rsa -b 4096 ~/.ssh/id_gnu_linux` 
+    ex: `ssh-keygen -t rsa -b 4096` 
 
 - L'installation de libvirt sur votre système. Vous pouvez installer libvirt en utilisant les commandes spécifiques à votre distribution Linux. Libvirt depend de l'hyperviseur qemu/kvm
 

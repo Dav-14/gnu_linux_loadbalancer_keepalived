@@ -2,7 +2,7 @@ resource "libvirt_volume" "os_image" {
   count  = var.globalCount
   name   = "${var.hostname}-${count.index}-os_image"
   pool   = "default"
-  source = "${var.base_image}-${count.index}.qcow2"
+  source = "${var.base_image_prefix}-${count.index}.qcow2"
   format = "qcow2"
 }
 
@@ -28,7 +28,7 @@ data "template_file" "user_data" {
   vars = {
     hostname   = "${var.hostname}-${count.index}"
     fqdn       = "${var.hostname}-${count.index}.${var.domain}"
-    public_key = file(var.private_key_path)
+    public_key = file(var.public_key_path)
   }
 }
 
@@ -47,9 +47,6 @@ data "template_file" "network_config" {
   template = file("${path.module}/network_config_${var.ip_type}.cfg")
 }
 
-
-
-// Create the machine
 resource "libvirt_domain" "domain-debian" {
   count = var.globalCount
   
@@ -59,7 +56,7 @@ resource "libvirt_domain" "domain-debian" {
   vcpu   = var.cpu
 
   autostart  = true
-  qemu_agent = true
+  qemu_agent = true # Parameter Wait for IP
 
   disk {
     volume_id = libvirt_volume.os_image[count.index].id
@@ -71,15 +68,12 @@ resource "libvirt_domain" "domain-debian" {
 
   network_interface {
     network_name   = "default"
-    # wait_for_lease = true
+    wait_for_lease = true # Parameter Wait for IP
   }
 
 
   cloudinit = libvirt_cloudinit_disk.commoninit[count.index].id
 
-  # IMPORTANT
-  # Ubuntu can hang is a isa-serial is not present at boot time.
-  # If you find your CPU 100% and never is available this is why
   console {
     type        = "pty"
     target_port = "0"
@@ -92,37 +86,32 @@ resource "libvirt_domain" "domain-debian" {
     autoport    = "true"
   }
 
-
-  # provisioner "remote-exec" {
-  #   inline = [
-  #     "cloud-init status --wait",
-  #   ]
-
-  #   connection {
-  #     host     = "${self.network_interface.0.addresses.0}"
-  #     type     = "ssh"
-  #     user     = "ansible"
-  #     private_key = file("${var.private_key_path}")
-  #   }
-  # }
-
-
-
-  # provisioner "local-exec" {
-  #   command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u ansible -i inventory-${count.index} --private-key ${var.private_key_path} ../ansible/playbooks/configure_ssh.yml"
-  # }
 }
 
-# resource "local_file" "ansible_inventory" {
-#   content = templatefile("./inventory.tmpl", {
-#     hostname        = "${var.hostname}-${count.index}"
-#     hosts_ips         = "${libvirt_domain.domain-debian.*.network_interface.0.addresses}"
-#     ssh_private_key = "${var.private_key_path}"
-#   })
-#   filename = "inventory.ini"
-# }
-
-
-output "ips" {
+output "ips" {    # Parameter Wait for IP, with wait_for_lease && qemu_agent
   value = libvirt_domain.domain-debian.*.network_interface.0.addresses
+}
+
+
+data "template_file" "inventory" {
+  template = file("${path.module}/inventory.tpl")
+  vars = {
+    master_hostname          = libvirt_domain.domain-debian[0].name
+    master_host_ip           = libvirt_domain.domain-debian[0].network_interface[0].addresses[0]
+    master_ssh_private_key   = var.private_key_path
+    other_servers            = jsonencode([
+      for instance in slice(libvirt_domain.domain-debian, 1, length(libvirt_domain.domain-debian)) : {
+        hostname = instance.name
+        ip       = instance.network_interface[0].addresses[0]
+      }
+    ])
+    # Add more variables as needed
+  }
+}
+
+resource "null_resource" "inventory_file" {
+  provisioner "local-exec" {
+    command = "echo '${data.template_file.inventory.rendered}' > inventory/inventory.ini"
+  }
+  depends_on = [libvirt_domain.domain-debian]
 }
