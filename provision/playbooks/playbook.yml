@@ -1,0 +1,22 @@
+---
+- hosts: all
+  gather_facts: true
+  become: true
+  roles:
+    - role: ssh_prerequises
+    - role: haproxy
+    # - role: backend
+    # - role: ufw
+    # - role: apparmor
+
+- hosts: master
+  gather_facts: true
+  become: true
+  roles:
+    - role: keepalived/master
+
+- hosts: node
+  gather_facts: true
+  become: true
+  roles:
+    - role: keepalived/master

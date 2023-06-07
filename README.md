@@ -5,7 +5,7 @@ Ce projet utilise Terraform et Ansible pour automatiser le déploiement d'une in
 ## Prérequis
 
 Avant de commencer, assurez-vous d'avoir les éléments suivants :
-- Docker installé (pour terraform et ansible)
+- Terraform `>= 1.2.5`, Ansible `>= core 2.15.0`, Python3 `>= 3.11.3`
 
 - Une clé SSH nommée `gnu_linux` située dans le répertoire `~/.ssh/`. Cette clé sera utilisée pour accéder aux machines virtuelles provisionnées par le projet.
 
