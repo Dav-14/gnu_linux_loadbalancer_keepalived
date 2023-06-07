@@ -15,6 +15,7 @@ resource "libvirt_volume" "worker-data" {
 // Use CloudInit ISO to add ssh-key to the instance
 resource "libvirt_cloudinit_disk" "commoninit" {
   count          = var.globalCount
+  
   name           = "${var.hostname}-${count.index}-commoninit.iso"
   pool           = "default"
   user_data      = data.template_cloudinit_config.config[count.index].rendered
@@ -48,6 +49,7 @@ data "template_file" "network_config" {
 }
 
 resource "libvirt_domain" "domain-debian" {
+  depends_on = [ libvirt_cloudinit_disk.commoninit ]
   count = var.globalCount
   
   # domain name in libvirt, not hostname

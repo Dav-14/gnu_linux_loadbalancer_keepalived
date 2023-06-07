@@ -1,0 +1,13 @@
+---
+- name: Update packages
+  become: true
+  apt:
+    name: "*"
+    state: latest
+
+- name: Install essentials packages
+  become: true
+  package:
+    name: "{{ packages }}"
+    state: latest
+

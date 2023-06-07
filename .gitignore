@@ -1,5 +1,5 @@
 debian-11*
 *.lock.kcl
-.terraform
+.terraform*
 *.tfstate*
 inventory.ini
